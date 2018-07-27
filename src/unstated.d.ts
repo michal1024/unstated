@@ -29,3 +29,12 @@ export interface ProviderProps {
 }
 
 export const Provider: React.SFC<ProviderProps>;
+
+export interface NamedContaners = {
+  [name: string]: ContainerType<any>
+}
+
+export function withContainers<WrappedComponentProps>(
+  containers: NamedContaners, 
+  WrappedComponent: React.ComponentType<WrappedComponentProps>
+) : React.SFC<WrappedComponentProps - NamedContaners>;

@@ -1,5 +1,5 @@
 // @flow
-import React, { type Node } from 'react';
+import React, { type Node, type ComponentType } from 'react';
 import createReactContext from 'create-react-context';
 
 type Listener = () => mixed;
@@ -175,6 +175,40 @@ export function Provider(props: ProviderProps) {
         );
       }}
     </StateContext.Consumer>
+  );
+}
+
+export type NamedContaners = {
+  [name: string]: Class<ContainerType>
+};
+
+function createContainersProps(
+  containers: NamedContaners,
+  instances: Array<ContainerType>
+) {
+  return Object.getOwnPropertyNames(containers).reduce(
+    (props, propName, idx) => {
+      props[propName] = instances[idx];
+      return props;
+    },
+    {}
+  );
+}
+
+export function withContainers(
+  containers: NamedContaners,
+  WrappedComponent: ComponentType<Object>
+): (props: {}) => Node {
+  let containerTypes = Object.getOwnPropertyNames(containers).map(
+    key => containers[key]
+  );
+  return (props: {}) => (
+    <Subscribe to={containerTypes}>
+      {(...instances) => {
+        const provided = createContainersProps(containers, instances);
+        return <WrappedComponent {...props} {...provided} />;
+      }}
+    </Subscribe>
   );
 }
 
